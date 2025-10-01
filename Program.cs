@@ -6,25 +6,20 @@ using System.Collections.Generic;
 /// </summary>
 abstract class Device
 {
-    protected double power;  // Потужність приладу
+    protected double power;  // Потужність приладу в Вт
 
-    // Конструктор базового класу
     public Device(double power)
     {
         this.power = power;
         Console.WriteLine($"{GetType().Name} created with {power} W");
     }
 
-    // Абстрактний метод – обов'язково реалізується в похідних класах
-    public abstract double PowerUsage();
-
-    // Віртуальний метод – можна перевизначити в похідних
-    public virtual void ShowInfo()
+    // Віртуальний метод: розрахунок добового споживання у кВт·год
+    public virtual double DailyEnergyUsage()
     {
-        Console.WriteLine($"{GetType().Name} power: {power} W");
+        return power * 24 / 1000.0;
     }
 
-    // Деструктор
     ~Device()
     {
         Console.WriteLine($"{GetType().Name} destroyed");
@@ -38,22 +33,13 @@ class Laptop : Device
 {
     public Laptop(double power) : base(power) { }
 
-    // Реалізація абстрактного методу
-    public override double PowerUsage()
+    public override double DailyEnergyUsage()
     {
-        return power;
+        // Специфічний розрахунок для ноутбука, якщо потрібно
+        return base.DailyEnergyUsage();
     }
 
-    // Перевизначення віртуального методу (опціонально)
-    public override void ShowInfo()
-    {
-        Console.WriteLine($"Laptop consumes {power} W");
-    }
-
-    ~Laptop()
-    {
-        Console.WriteLine("Laptop destructor called");
-    }
+    ~Laptop() { Console.WriteLine("Laptop destructor called"); }
 }
 
 /// <summary>
@@ -63,20 +49,13 @@ class Fridge : Device
 {
     public Fridge(double power) : base(power) { }
 
-    public override double PowerUsage()
+    public override double DailyEnergyUsage()
     {
-        return power;
+        // Специфічний розрахунок для холодильника, якщо потрібно
+        return base.DailyEnergyUsage();
     }
 
-    public override void ShowInfo()
-    {
-        Console.WriteLine($"Fridge consumes {power} W");
-    }
-
-    ~Fridge()
-    {
-        Console.WriteLine("Fridge destructor called");
-    }
+    ~Fridge() { Console.WriteLine("Fridge destructor called"); }
 }
 
 class Program
@@ -90,12 +69,10 @@ class Program
         };
 
         double totalEnergy = 0;
-
-        foreach (var d in devices)
+        foreach (var device in devices)
         {
-            d.ShowInfo();
-            double daily = d.PowerUsage() * 24 / 1000.0;
-            Console.WriteLine($"{d.GetType().Name} uses {daily:F2} kWh per day\n");
+            double daily = device.DailyEnergyUsage(); // Розрахунок всередині класу
+            Console.WriteLine($"{device.GetType().Name} uses {daily:F2} kWh per day");
             totalEnergy += daily;
         }
 
