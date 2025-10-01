@@ -15,10 +15,13 @@ abstract class Device
         Console.WriteLine($"{GetType().Name} created with {power} W");
     }
 
-    // Віртуальний метод, який можна перевизначити
-    public virtual double PowerUsage()
+    // Абстрактний метод – обов'язково реалізується в похідних класах
+    public abstract double PowerUsage();
+
+    // Віртуальний метод – можна перевизначити в похідних
+    public virtual void ShowInfo()
     {
-        return power;
+        Console.WriteLine($"{GetType().Name} power: {power} W");
     }
 
     // Деструктор
@@ -33,15 +36,24 @@ abstract class Device
 /// </summary>
 class Laptop : Device
 {
-    public Laptop(double power) : base(power) { }  // Використовуємо конструктор базового класу
+    public Laptop(double power) : base(power) { }
 
+    // Реалізація абстрактного методу
     public override double PowerUsage()
     {
-        // Можна додати специфічний розрахунок для ноутбука
         return power;
     }
 
-    ~Laptop() { Console.WriteLine("Laptop destructor called"); }
+    // Перевизначення віртуального методу (опціонально)
+    public override void ShowInfo()
+    {
+        Console.WriteLine($"Laptop consumes {power} W");
+    }
+
+    ~Laptop()
+    {
+        Console.WriteLine("Laptop destructor called");
+    }
 }
 
 /// <summary>
@@ -53,11 +65,18 @@ class Fridge : Device
 
     public override double PowerUsage()
     {
-        // Можна додати специфічний розрахунок для холодильника
         return power;
     }
 
-    ~Fridge() { Console.WriteLine("Fridge destructor called"); }
+    public override void ShowInfo()
+    {
+        Console.WriteLine($"Fridge consumes {power} W");
+    }
+
+    ~Fridge()
+    {
+        Console.WriteLine("Fridge destructor called");
+    }
 }
 
 class Program
@@ -71,10 +90,12 @@ class Program
         };
 
         double totalEnergy = 0;
+
         foreach (var d in devices)
         {
+            d.ShowInfo();
             double daily = d.PowerUsage() * 24 / 1000.0;
-            Console.WriteLine($"{d.GetType().Name} uses {daily:F2} kWh per day");
+            Console.WriteLine($"{d.GetType().Name} uses {daily:F2} kWh per day\n");
             totalEnergy += daily;
         }
 
